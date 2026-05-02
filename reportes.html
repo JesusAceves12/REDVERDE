@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REDVERDE | Reportes</title>
+  <meta name="description" content="Reporta incidencias en los parques de tu ciudad.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .report-section {
+      padding: 8rem 5% 4rem;
+      min-height: calc(100vh - 200px);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      background-color: var(--bg-color);
+    }
+
+    .report-container {
+      background: var(--white);
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .report-container h2 {
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .report-container p {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .report-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--secondary-color);
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 0.8rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: var(--transition);
+      background-color: #fafafa;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.2);
+      background-color: var(--white);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .report-item {
+      padding: 1.2rem;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      background-color: #fafafa;
+      text-align: left;
+    }
+
+    .report-item h4 {
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-pendiente { background-color: #fff3cd; color: #856404; }
+    .status-en-proceso { background-color: #cce5ff; color: #004085; }
+    .status-resuelto { background-color: #d4edda; color: #155724; }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-leaf"></i> REDVERDE
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="parques.html">Parques</a></li>
+      <li><a href="actividades.html">Actividades</a></li>
+      <li><a href="reportes.html" style="color: var(--primary-color);">Reportes</a></li>
+      <li><a href="cuenta.html" class="btn btn-primary" style="padding: 0.5rem 1.5rem; color: white;">Cuenta</a></li>
+    </ul>
+  </nav>
+
+  <!-- Report Section -->
+  <section class="report-section">
+    <div class="report-container">
+      <h2>Reportar Incidencia</h2>
+      <p>Ayúdanos a mantener nuestros parques en óptimas condiciones. Describe el problema a continuación.</p>
+
+      <form class="report-form" id="formReporte">
+        <div class="form-group">
+          <label for="repParque">Selecciona el Parque</label>
+          <select id="repParque" name="park" required>
+            <option value="" disabled selected>Cargando parques...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="repIncidencia">Incidencia</label>
+          <textarea id="repIncidencia" name="incidencia" required placeholder="Describe detalladamente el problema o situación que observaste..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="repFoto">Fotografía / Evidencia (Opcional)</label>
+          <input type="file" id="repFoto" name="foto_evidencia" accept="image/*">
+        </div>
+        <!-- El campo situacion_del_reporte y ID_usuario se enviarán internamente -->
+        <button type="submit" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Enviar Reporte</button>
+      </form>
+    </div>
+
+    <!-- Mis Reportes (Oculto si no hay sesión) -->
+    <div class="report-container" id="misReportesContainer" style="display: none; margin-top: 2rem;">
+      <h2>Mis Reportes</h2>
+      <p style="margin-bottom: 1rem;">Aquí puedes ver el estado de las incidencias que has reportado.</p>
+      <div id="listaReportes">
+        <!-- Los reportes se cargarán aquí -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <i class="fa-solid fa-leaf"></i> REDVERDE
+      </div>
+      <div class="social-links">
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2026 REDVERDE. Todos los derechos reservados. Diseñado para un mundo mejor.</p>
+    </div>
+  </footer>
+
+</body>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const repParque = document.getElementById("repParque");
+    const formReporte = document.getElementById("formReporte");
+
+    // Cargar parques dinámicamente
+    async function cargarParques() {
+      try {
+        const response = await fetch("http://localhost:3000/api/parques");
+        if (response.ok) {
+          const parques = await response.json();
+          repParque.innerHTML = '<option value="" disabled selected>-- Elige un parque --</option>';
+          parques.forEach(p => {
+            repParque.innerHTML += `<option value="${p.ID_parque}">${p.nombre}</option>`;
+          });
+        }
+      } catch (error) {
+        console.error("Error cargando parques:", error);
+        repParque.innerHTML = '<option value="" disabled>Error al cargar parques</option>';
+      }
+    }
+
+    cargarParques();
+
+    // Lógica para Mis Reportes
+    const misReportesContainer = document.getElementById("misReportesContainer");
+    const listaReportes = document.getElementById("listaReportes");
+
+    async function cargarMisReportes(user) {
+      const userId = user.ID_usuario || user.id;
+      if (!userId) return;
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/reportes/usuario/${userId}`);
+        if (response.ok) {
+          const reportes = await response.json();
+          misReportesContainer.style.display = "block";
+
+          if (reportes.length === 0) {
+            listaReportes.innerHTML = "<p>Aún no has creado ningún reporte.</p>";
+            return;
+          }
+
+          listaReportes.innerHTML = "";
+          reportes.forEach(rep => {
+            const date = new Date(rep.fecha_creacion).toLocaleDateString('es-ES', {
+              year: 'numeric', month: 'long', day: 'numeric'
+            });
+            
+            // Determinar clase de estado
+            const statusStr = rep.situacion_del_reporte ? rep.situacion_del_reporte.toLowerCase() : 'pendiente';
+            let badgeClass = 'status-pendiente';
+            if (statusStr.includes('proceso') || statusStr.includes('revisión')) badgeClass = 'status-en-proceso';
+            if (statusStr.includes('resuelto') || statusStr.includes('solucionado')) badgeClass = 'status-resuelto';
+
+            const card = document.createElement('div');
+            card.className = 'report-item';
+            card.innerHTML = `
+              <h4>
+                ${rep.parque_nombre || 'Parque Desconocido'}
+                <span class="status-badge ${badgeClass}">${rep.situacion_del_reporte || 'Pendiente'}</span>
+              </h4>
+              <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem; text-align: left;">
+                <i class="fa-regular fa-calendar"></i> ${date}
+              </p>
+              <p style="text-align: left; margin-bottom: 0;">${rep.incidencia}</p>
+              ${rep.foto_evidencia ? `<a href="${rep.foto_evidencia}" target="_blank" style="display: inline-block; margin-top: 0.5rem; font-size: 0.9rem; color: var(--primary-color);">Ver Evidencia <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
+            `;
+            listaReportes.appendChild(card);
+          });
+        }
+      } catch (error) {
+        console.error("Error cargando mis reportes:", error);
+      }
+    }
+
+    // Verificar sesión al cargar
+    const userStr = localStorage.getItem("redverde_user");
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      cargarMisReportes(user);
+    }
+
+    formReporte.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const currentUserStr = localStorage.getItem("redverde_user");
+      if (!currentUserStr) {
+        alert("Debes iniciar sesión para poder enviar un reporte.");
+        window.location.href = "cuenta.html";
+        return;
+      }
+
+      const currentUser = JSON.parse(currentUserStr);
+
+      // Usamos FormData para poder enviar archivos binarios (fotos)
+      const formData = new FormData();
+      formData.append('ID_parque', repParque.value);
+      formData.append('incidencia', document.getElementById("repIncidencia").value);
+      formData.append('situacion_del_reporte', "Pendiente");
+      formData.append('ID_usuario', currentUser.ID_usuario || currentUser.id);
+      
+      const fotoInput = document.getElementById("repFoto");
+      if (fotoInput.files.length > 0) {
+        formData.append('foto_evidencia', fotoInput.files[0]);
+      }
+
+      try {
+        const response = await fetch("http://localhost:3000/api/reportes", {
+          method: "POST",
+          // Con FormData no definimos Content-Type header; el navegador lo hace por nosotros
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert("¡Tu reporte ha sido enviado exitosamente!");
+          formReporte.reset();
+          cargarMisReportes(currentUser); // Recargar la lista
+        } else {
+          alert("Error al enviar el reporte: " + (data.error || "Desconocido"));
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Hubo un problema al conectar con el servidor.");
+      }
+    });
+  });
+</script>
+
+</html>

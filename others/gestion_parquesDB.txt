@@ -1,0 +1,95 @@
+CREATE DATABASE IF NOT EXISTS gestion_parques;
+USE gestion_parques;
+
+-- 1. Tabla Perfil (Relación 1:1 con Usuario)
+CREATE TABLE Perfil (
+    ID_perfil INT AUTO_INCREMENT PRIMARY KEY,
+    biografia TEXT, -- [cite: 4]
+    foto_perfil VARCHAR(255), -- [cite: 23]
+    reputacion INT DEFAULT 0 -- [cite: 24, 25, 26]
+);
+
+-- 2. Tabla Usuario
+CREATE TABLE Usuario (
+    ID_usuario INT AUTO_INCREMENT PRIMARY KEY, -- [cite: 9]
+    nombre VARCHAR(100) NOT NULL, -- [cite: 8]
+    email VARCHAR(150) UNIQUE NOT NULL, -- [cite: 10]
+    password VARCHAR(255) NOT NULL, -- [cite: 1]
+    rol ENUM('Admin', 'Organizador', 'Ciudadano') DEFAULT 'Ciudadano', -- [cite: 2]
+    ID_perfil INT UNIQUE, -- [cite: 3]
+    FOREIGN KEY (ID_perfil) REFERENCES Perfil(ID_perfil) ON DELETE SET NULL
+);
+
+-- 3. Tabla Condicion
+CREATE TABLE Condicion (
+    ID_condicion INT AUTO_INCREMENT PRIMARY KEY, -- [cite: 46]
+    categoria VARCHAR(50), -- [cite: 47, 49]
+    nivel INT, -- [cite: 48, 50]
+    comentarios TEXT, -- [cite: 56, 57, 60]
+    fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- [cite: 58, 61]
+);
+
+-- 4. Tabla Parque
+CREATE TABLE Parque (
+    ID_parque INT AUTO_INCREMENT PRIMARY KEY, -- [cite: 44]
+    nombre VARCHAR(100) NOT NULL,
+    direccion VARCHAR(255), -- [cite: 45]
+    latitud DECIMAL(10, 8), -- [cite: 31, 33]
+    longitud DECIMAL(11, 8), -- [cite: 28, 32]
+    horario VARCHAR(100), -- [cite: 40, 41]
+    ID_condicion INT UNIQUE,
+    FOREIGN KEY (ID_condicion) REFERENCES Condicion(ID_condicion)
+);
+
+-- 5. Tabla Reporte (Ahora independiente para el historial)
+CREATE TABLE Reporte (
+    ID_reporte INT AUTO_INCREMENT PRIMARY KEY, -- [cite: 34]
+    incidencia TEXT NOT NULL, -- [cite: 63, 65]
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP, -- [cite: 64, 66, 69, 71]
+    foto_evidencia VARCHAR(255), -- [cite: 67, 70, 72]
+    situacion_del_reporte VARCHAR(50), -- [cite: 68]
+    ID_usuario INT, -- El usuario que crea el reporte [cite: 19, 29]
+    FOREIGN KEY (ID_usuario) REFERENCES Usuario(ID_usuario)
+);
+
+-- 6. NUEVA TABLA: Historial_Reportes (Relación M:N entre Parque y Reporte)
+CREATE TABLE Historial_Reportes (
+    ID_parque INT,
+    ID_reporte INT,
+    fecha_vinculacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ID_parque, ID_reporte),
+    FOREIGN KEY (ID_parque) REFERENCES Parque(ID_parque) ON DELETE CASCADE,
+    FOREIGN KEY (ID_reporte) REFERENCES Reporte(ID_reporte) ON DELETE CASCADE
+);
+
+-- 7. Tabla Actividad / Evento
+CREATE TABLE Actividad_Evento (
+    ID_actividad INT AUTO_INCREMENT PRIMARY KEY, -- [cite: 15]
+    titulo VARCHAR(150) NOT NULL, -- [cite: 16]
+    descripcion TEXT, -- [cite: 36, 37]
+    tipo VARCHAR(50), -- [cite: 13]
+    fecha DATETIME, -- [cite: 12, 14]
+    organizador VARCHAR(100), -- [cite: 5, 6, 7]
+    cupo INT, -- [cite: 38, 39]
+    ID_parque INT,
+    FOREIGN KEY (ID_parque) REFERENCES Parque(ID_parque) ON DELETE CASCADE -- [cite: 42, 43]
+);
+
+-- 8. Tabla Equipamiento
+CREATE TABLE Equipamiento (
+    ID_equipamiento INT AUTO_INCREMENT PRIMARY KEY, -- [cite: 76]
+    tipo VARCHAR(100), -- [cite: 76]
+    estado_mantenimiento VARCHAR(100), -- [cite: 74, 75]
+    ID_parque INT,
+    FOREIGN KEY (ID_parque) REFERENCES Parque(ID_parque) ON DELETE CASCADE -- [cite: 53, 59]
+);
+
+-- 9. Tabla Intermedia: Asiste (M:N Usuario-Actividad)
+CREATE TABLE Asiste (
+    ID_usuario INT,
+    ID_actividad INT,
+    fecha_inscripcion DATETIME DEFAULT CURRENT_TIMESTAMP, -- [cite: 11]
+    PRIMARY KEY (ID_usuario, ID_actividad),
+    FOREIGN KEY (ID_usuario) REFERENCES Usuario(ID_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (ID_actividad) REFERENCES Actividad_Evento(ID_actividad) ON DELETE CASCADE -- [cite: 20, 27]
+);

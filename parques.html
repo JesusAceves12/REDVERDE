@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REDVERDE | Parques</title>
+  <meta name="description" content="Explora los parques de la ciudad.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-leaf"></i> REDVERDE
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="parques.html" style="color: var(--primary-color);">Parques</a></li>
+      <li><a href="actividades.html">Actividades</a></li>
+      <li><a href="reportes.html">Reportes</a></li>
+      <li><a href="cuenta.html" class="btn btn-primary" style="padding: 0.5rem 1.5rem; color: white;">Cuenta</a></li>
+    </ul>
+  </nav>
+
+  <!-- Parks Section -->
+  <section class="services" id="parques" style="padding-top: 8rem; min-height: calc(100vh - 200px);">
+    <div class="section-header">
+      <h2>Directorio de Parques</h2>
+      <p>Descubre los espacios verdes de tu comunidad y su estado actual.</p>
+    </div>
+    <div class="services-grid" id="parques-grid">
+      <!-- Los parques se cargarán dinámicamente aquí -->
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <i class="fa-solid fa-leaf"></i> REDVERDE
+      </div>
+      <div class="social-links">
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2026 REDVERDE. Todos los derechos reservados. Diseñado para un mundo mejor.</p>
+    </div>
+  </footer>
+
+</body>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const parquesGrid = document.getElementById("parques-grid");
+    
+    // Iconos variados para los parques
+    const icons = [
+      "fa-solid fa-tree-city",
+      "fa-solid fa-seedling",
+      "fa-solid fa-dog",
+      "fa-solid fa-leaf",
+      "fa-solid fa-campground"
+    ];
+
+    fetch("http://localhost:3000/api/parques")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Error en la red");
+        }
+        return response.json();
+      })
+      .then(data => {
+        parquesGrid.innerHTML = ""; // Limpiar contenido
+        
+        if (data.length === 0) {
+          parquesGrid.innerHTML = "<p>No hay parques disponibles en este momento.</p>";
+          return;
+        }
+
+        data.forEach((parque, index) => {
+          const iconClass = icons[index % icons.length];
+
+          const card = document.createElement("div");
+          card.className = "service-card";
+          card.style.cursor = "pointer";
+          card.onclick = () => {
+            window.location.href = `parque-detalle.html?id=${parque.ID_parque}`;
+          };
+          
+          card.innerHTML = `
+            <i class="${iconClass}"></i>
+            <h3>${parque.nombre}</h3>
+            <p style="margin-top: 1rem; color: var(--primary-color); font-weight: 500;">Ver detalles <i class="fa-solid fa-arrow-right"></i></p>
+          `;
+          parquesGrid.appendChild(card);
+        });
+      })
+      .catch(error => {
+        console.error("Error obteniendo parques:", error);
+        parquesGrid.innerHTML = "<p>Hubo un error al cargar los parques.</p>";
+      });
+  });
+</script>
+
+</html>

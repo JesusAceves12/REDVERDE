@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REDVERDE | Mis Actividades</title>
+  <meta name="description" content="Actividades a las que te has inscrito.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-leaf"></i> REDVERDE
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="parques.html">Parques</a></li>
+      <li><a href="actividades.html" style="color: var(--primary-color);">Actividades</a></li>
+      <li><a href="reportes.html">Reportes</a></li>
+      <li><a href="cuenta.html" class="btn btn-primary" style="padding: 0.5rem 1.5rem; color: white;">Cuenta</a></li>
+    </ul>
+  </nav>
+
+  <!-- My Activities Section -->
+  <section class="services" id="mis-actividades" style="padding-top: 8rem; min-height: calc(100vh - 200px);">
+    <div class="section-header">
+      <a href="actividades.html" style="display: inline-block; margin-bottom: 1rem; color: var(--primary-color); font-weight: 500; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Volver a Actividades</a>
+      <h2>Mis Actividades</h2>
+      <p>Aquí puedes ver los eventos y talleres a los que te has registrado.</p>
+    </div>
+
+    <div class="services-grid" id="misActividadesGrid">
+      <p style="text-align: center; grid-column: 1 / -1; color: var(--text-light);">Cargando tus actividades...</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <i class="fa-solid fa-leaf"></i> REDVERDE
+      </div>
+      <div class="social-links">
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2026 REDVERDE. Todos los derechos reservados. Diseñado para un mundo mejor.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const misActividadesGrid = document.getElementById('misActividadesGrid');
+      const userStr = localStorage.getItem('redverde_user');
+      
+      if (!userStr) {
+        alert('Debes iniciar sesión para ver tus actividades.');
+        window.location.href = 'cuenta.html';
+        return;
+      }
+      
+      const user = JSON.parse(userStr);
+
+      function getIconForTipo(tipo) {
+        switch(tipo?.toLowerCase()) {
+          case 'deportivo': return 'fa-solid fa-person-running';
+          case 'cultural': return 'fa-solid fa-palette';
+          case 'limpieza': return 'fa-solid fa-hands-holding-circle';
+          default: return 'fa-solid fa-leaf';
+        }
+      }
+
+      function formatFecha(fechaStr) {
+        if (!fechaStr) return 'Fecha no especificada';
+        const date = new Date(fechaStr);
+        return date.toLocaleDateString('es-ES', { 
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', 
+            hour: '2-digit', minute: '2-digit' 
+        });
+      }
+
+      async function cargarMisActividades() {
+        try {
+          const response = await fetch(`http://localhost:3000/api/actividades/usuario/${user.ID_usuario}`);
+          if (response.ok) {
+            const actividades = await response.json();
+            
+            if (actividades.length === 0) {
+              misActividadesGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-light);">Aún no te has inscrito a ninguna actividad. ¡Anímate a participar!</p>';
+              return;
+            }
+            
+            misActividadesGrid.innerHTML = '';
+            
+            actividades.forEach(act => {
+              const icon = getIconForTipo(act.tipo);
+              const fechaFormateada = formatFecha(act.fecha);
+              const parqueTexto = act.parque_nombre ? ` en ${act.parque_nombre}` : '';
+              const fechaInscripcion = formatFecha(act.fecha_inscripcion);
+              
+              const card = document.createElement('div');
+              card.className = 'service-card';
+              card.innerHTML = `
+                <i class="${icon}"></i>
+                <h3>${act.titulo}</h3>
+                <p><strong>${fechaFormateada}</strong>${parqueTexto}</p>
+                <p>${act.descripcion}</p>
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: left; font-size: 0.9em; color: var(--text-light);">
+                  <p style="margin-bottom: 0.3rem;"><i class="fa-solid fa-user-tie"></i> <strong>Organiza:</strong> ${act.organizador || 'Anónimo'}</p>
+                  <p><i class="fa-solid fa-calendar-check"></i> <strong>Inscrito el:</strong> ${fechaInscripcion}</p>
+                  <button class="btn" onclick="desinscribirse(${act.ID_actividad})" style="margin-top: 1rem; width: 100%; background: #ff4757; color: white;">Desinscribirme</button>
+                </div>
+              `;
+              misActividadesGrid.appendChild(card);
+            });
+          } else {
+             misActividadesGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: #ff6b6b;">Error al cargar tus actividades.</p>';
+          }
+        } catch (error) {
+          console.error('Error cargando actividades:', error);
+          misActividadesGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: #ff6b6b;">Hubo un problema de conexión. Intenta recargar la página.</p>';
+        }
+      }
+      
+      window.desinscribirse = async function(idActividad) {
+        if (!confirm('¿Estás seguro de que quieres desinscribirte de esta actividad?')) return;
+        
+        try {
+            const response = await fetch(`http://localhost:3000/api/actividades/${idActividad}/desinscribirse`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ID_usuario: user.ID_usuario })
+            });
+            const data = await response.json();
+            
+            if (response.ok) {
+                alert('Te has desinscrito exitosamente.');
+                cargarMisActividades();
+            } else {
+                alert(data.error || 'Error al desinscribirse.');
+            }
+        } catch (error) {
+            console.error('Error desinscribiéndose:', error);
+            alert('Error al conectar con el servidor.');
+        }
+      };
+
+      cargarMisActividades();
+    });
+  </script>
+</body>
+</html>

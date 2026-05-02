@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REDVERDE | Mi Cuenta</title>
+  <meta name="description" content="Inicia sesión o regístrate en REDVERDE.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .auth-section {
+      padding: 8rem 5% 4rem;
+      min-height: calc(100vh - 200px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--bg-color);
+    }
+
+    .auth-container {
+      background: var(--white);
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .auth-container h2 {
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-container p {
+      margin-bottom: 2rem;
+      color: var(--text-light);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      text-align: left;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--secondary-color);
+      font-size: 0.9rem;
+    }
+
+    .form-group input {
+      padding: 0.8rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: var(--transition);
+      background-color: #fafafa;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.2);
+      background-color: var(--white);
+    }
+
+    .auth-links {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .auth-links a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .auth-links a:hover {
+      text-decoration: underline;
+    }
+
+    .profile-details {
+      margin-top: 1.5rem;
+      background: #fafafa;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+
+    .profile-details p {
+      margin-bottom: 0.8rem !important;
+      color: var(--text-color) !important;
+      font-size: 1.05rem;
+    }
+
+    .profile-details p:last-child {
+      margin-bottom: 0 !important;
+    }
+
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--primary-color);
+      background-color: #eee;
+    }
+
+    .reputation-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #fff;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      box-shadow: 0 4px 10px rgba(255, 165, 0, 0.3);
+    }
+
+    .bio-box {
+      background: #fdfdfd;
+      border-left: 4px solid var(--primary-color);
+      padding: 1rem;
+      margin-top: 1rem;
+      font-style: italic;
+      color: #555;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-leaf"></i> REDVERDE
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="parques.html">Parques</a></li>
+      <li><a href="actividades.html">Actividades</a></li>
+      <li><a href="reportes.html">Reportes</a></li>
+      <li><a href="cuenta.html" class="btn btn-primary"
+          style="padding: 0.5rem 1.5rem; color: white; background-color: var(--secondary-color);">Cuenta</a></li>
+    </ul>
+  </nav>
+
+  <!-- Auth Section -->
+  <section class="auth-section">
+    <div class="auth-container" id="authContainer">
+      <h2 id="authTitle">Iniciar Sesión</h2>
+      <p id="authSubtitle">Ingresa a tu cuenta para gestionar tus reportes y actividades.</p>
+
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <label for="loginEmail">Correo Electrónico</label>
+          <input type="email" id="loginEmail" name="email" required placeholder="tu@email.com">
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Contraseña</label>
+          <input type="password" id="loginPassword" name="password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">Iniciar Sesión</button>
+      </form>
+
+      <form id="registroForm" class="auth-form" style="display: none;">
+        <div class="form-group">
+          <label for="name">Nombre Completo</label>
+          <input type="text" id="name" name="name" required placeholder="Tu nombre">
+        </div>
+        <div class="form-group">
+          <label for="email">Correo Electrónico</label>
+          <input type="email" id="email" name="email" required placeholder="tu@email.com">
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" name="password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">Registrarse</button>
+      </form>
+
+      <div class="auth-links">
+        <p><span id="toggleText">¿No tienes una cuenta?</span> <a href="#" id="toggleAuthBtn">Regístrate aquí</a></p>
+      </div>
+    </div>
+
+    <!-- Contenedor de Perfil -->
+    <div class="auth-container" id="profileContainer" style="display: none; text-align: left; max-width: 500px;">
+      <div class="profile-header">
+        <img src="https://via.placeholder.com/120" alt="Foto de perfil" class="profile-pic" id="profilePic">
+        <h2 style="margin: 0;" id="profileNameTitle">Mi Perfil</h2>
+        <span class="reputation-badge" id="profileReputation">Reputación: 0</span>
+      </div>
+      
+      <div class="profile-details">
+        <p><strong>Nombre:</strong> <span id="profileName"></span></p>
+        <p><strong>Correo:</strong> <span id="profileEmail"></span></p>
+        <p><strong>Rol:</strong> <span id="profileRole"></span></p>
+        <div class="bio-box">
+          <p><strong>Bio:</strong> <span id="profileBio">Sin biografía...</span></p>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem;">
+        <button id="editProfileBtn" class="btn btn-primary">Editar Perfil</button>
+        <button id="logoutBtn" class="btn btn-primary" style="background-color: #e63946; border-color: #e63946;">Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <!-- Formulario de Edición de Perfil -->
+    <div class="auth-container" id="editProfileContainer" style="display: none; text-align: left; max-width: 500px;">
+      <h2>Personalizar Perfil</h2>
+      <p>Actualiza tu biografía y foto de perfil.</p>
+      
+      <form id="editProfileForm" class="auth-form">
+        <div class="form-group">
+          <label for="editBio">Biografía</label>
+          <textarea id="editBio" rows="4" placeholder="Cuéntanos un poco sobre ti..." style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #ddd; border-radius: 10px; font-family: 'Inter', sans-serif; resize: vertical;"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="editPhoto">Foto de Perfil</label>
+          <input type="file" id="editPhoto" accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Guardar Cambios</button>
+        <button type="button" id="cancelEditBtn" class="btn" style="background: #eee; color: #333; margin-top: 0.5rem;">Cancelar</button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const registroForm = document.getElementById('registroForm');
+    const authTitle = document.getElementById('authTitle');
+    const authSubtitle = document.getElementById('authSubtitle');
+    const toggleText = document.getElementById('toggleText');
+    const toggleAuthBtn = document.getElementById('toggleAuthBtn');
+
+    const authContainer = document.getElementById('authContainer');
+    const profileContainer = document.getElementById('profileContainer');
+    const editProfileContainer = document.getElementById('editProfileContainer');
+    const profileName = document.getElementById('profileName');
+    const profileNameTitle = document.getElementById('profileNameTitle');
+    const profileEmail = document.getElementById('profileEmail');
+    const profileRole = document.getElementById('profileRole');
+    const profileBio = document.getElementById('profileBio');
+    const profilePic = document.getElementById('profilePic');
+    const profileReputation = document.getElementById('profileReputation');
+    
+    const logoutBtn = document.getElementById('logoutBtn');
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const editProfileForm = document.getElementById('editProfileForm');
+
+    let isLogin = true;
+
+    // Verificar si el usuario ya está logueado
+    function checkLoginStatus() {
+      const userStr = localStorage.getItem('redverde_user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        showProfile(user);
+      } else {
+        showAuth();
+      }
+    }
+
+    function showProfile(user) {
+      authContainer.style.display = 'none';
+      editProfileContainer.style.display = 'none';
+      profileContainer.style.display = 'block';
+      
+      profileName.textContent = user.nombre;
+      profileNameTitle.textContent = user.nombre;
+      profileEmail.textContent = user.email;
+      profileRole.textContent = user.rol || 'Ciudadano';
+      profileBio.textContent = user.biografia || 'Sin biografía...';
+      profilePic.src = user.foto_perfil || 'https://via.placeholder.com/120';
+      profileReputation.textContent = `Reputación: ${user.reputacion || 0}`;
+    }
+
+    function showAuth() {
+      authContainer.style.display = 'block';
+      profileContainer.style.display = 'none';
+      editProfileContainer.style.display = 'none';
+    }
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('redverde_user');
+      showAuth();
+    });
+
+    editProfileBtn.addEventListener('click', () => {
+      const user = JSON.parse(localStorage.getItem('redverde_user'));
+      document.getElementById('editBio').value = user.biografia || '';
+      profileContainer.style.display = 'none';
+      editProfileContainer.style.display = 'block';
+    });
+
+    cancelEditBtn.addEventListener('click', () => {
+      editProfileContainer.style.display = 'none';
+      profileContainer.style.display = 'block';
+    });
+
+    editProfileForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const user = JSON.parse(localStorage.getItem('redverde_user'));
+      const idPerfil = user.ID_perfil;
+      
+      const formData = new FormData();
+      formData.append('biografia', document.getElementById('editBio').value);
+      formData.append('foto_perfil_existente', user.foto_perfil || '');
+      
+      const photoFile = document.getElementById('editPhoto').files[0];
+      if (photoFile) {
+        formData.append('foto_perfil', photoFile);
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/perfil/${idPerfil}`, {
+          method: 'PUT',
+          body: formData
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('redverde_user', JSON.stringify(data.usuario));
+          showProfile(data.usuario);
+          alert('¡Perfil actualizado!');
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Error al actualizar perfil:', error);
+        alert('Hubo un problema al conectar con el servidor.');
+      }
+    });
+
+    toggleAuthBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      isLogin = !isLogin;
+
+      if (isLogin) {
+        loginForm.style.display = 'flex';
+        registroForm.style.display = 'none';
+        authTitle.textContent = 'Iniciar Sesión';
+        authSubtitle.textContent = 'Ingresa a tu cuenta para gestionar tus reportes y actividades.';
+        toggleText.textContent = '¿No tienes una cuenta?';
+        toggleAuthBtn.textContent = 'Regístrate aquí';
+      } else {
+        loginForm.style.display = 'none';
+        registroForm.style.display = 'flex';
+        authTitle.textContent = 'Crear Cuenta';
+        authSubtitle.textContent = 'Únete a RedVerde para empezar a participar.';
+        toggleText.textContent = '¿Ya tienes una cuenta?';
+        toggleAuthBtn.textContent = 'Inicia sesión aquí';
+      }
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('redverde_user', JSON.stringify(data.usuario));
+          showProfile(data.usuario);
+          loginForm.reset();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        alert('Hubo un problema al conectar con el servidor.');
+      }
+    });
+
+    registroForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const nombre = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/api/registro', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ nombre, email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
+          registroForm.reset();
+          // Volver a la vista de login automáticamente
+          if (!isLogin) toggleAuthBtn.click();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Error al registrar:', error);
+        alert('Hubo un problema al conectar con el servidor.');
+      }
+    });
+
+    // Iniciar verificación al cargar la página
+    checkLoginStatus();
+  </script>
+
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <i class="fa-solid fa-leaf"></i> REDVERDE
+      </div>
+      <div class="social-links">
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2026 REDVERDE. Todos los derechos reservados. Diseñado para un mundo mejor.</p>
+    </div>
+  </footer>
+
+</body>
+
+</html>
