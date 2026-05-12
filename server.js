@@ -344,6 +344,76 @@ app.get('/api/reportes/usuario/:id', (req, res) => {
     });
 });
 
+// Endpoint para obtener todos los reportes (Administrador)
+app.get('/api/reportes/todos', (req, res) => {
+    const sql = `
+        SELECT r.ID_reporte, r.incidencia, r.fecha_creacion, r.situacion_del_reporte, r.foto_evidencia, 
+               p.nombre as parque_nombre, u.nombre as usuario_nombre
+        FROM reporte r
+        LEFT JOIN historial_reportes hr ON r.ID_reporte = hr.ID_reporte
+        LEFT JOIN parque p ON hr.ID_parque = p.ID_parque
+        LEFT JOIN Usuario u ON r.ID_usuario = u.ID_usuario
+        ORDER BY r.fecha_creacion DESC
+    `;
+    
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Error obteniendo todos los reportes:', err);
+            return res.status(500).json({ error: 'Error al obtener los reportes' });
+        }
+        res.status(200).json(results);
+    });
+});
+
+// Endpoint para actualizar el estado de un reporte (Administrador)
+app.put('/api/reportes/:id/estado', (req, res) => {
+    const idReporte = req.params.id;
+    const { situacion_del_reporte } = req.body;
+
+    if (!situacion_del_reporte) {
+        return res.status(400).json({ error: 'El estado es obligatorio' });
+    }
+
+    const sql = 'UPDATE reporte SET situacion_del_reporte = ? WHERE ID_reporte = ?';
+    db.query(sql, [situacion_del_reporte, idReporte], (err, result) => {
+        if (err) {
+            console.error('Error actualizando estado del reporte:', err);
+            return res.status(500).json({ error: 'Error al actualizar el estado' });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Reporte no encontrado' });
+        }
+        res.status(200).json({ mensaje: 'Estado actualizado exitosamente' });
+    });
+});
+
+// Endpoint para eliminar un reporte (Administrador)
+app.delete('/api/reportes/:id', (req, res) => {
+    const idReporte = req.params.id;
+
+    // Primero eliminamos de historial_reportes para no violar la clave foránea
+    const sqlDeleteHistorial = 'DELETE FROM historial_reportes WHERE ID_reporte = ?';
+    db.query(sqlDeleteHistorial, [idReporte], (errHistorial) => {
+        if (errHistorial) {
+            console.error('Error eliminando de historial_reportes:', errHistorial);
+            return res.status(500).json({ error: 'Error al eliminar referencias del reporte' });
+        }
+
+        // Luego eliminamos de reporte
+        const sqlDeleteReporte = 'DELETE FROM reporte WHERE ID_reporte = ?';
+        db.query(sqlDeleteReporte, [idReporte], (errReporte, resultReporte) => {
+            if (errReporte) {
+                console.error('Error eliminando reporte:', errReporte);
+                return res.status(500).json({ error: 'Error al eliminar el reporte' });
+            }
+            if (resultReporte.affectedRows === 0) {
+                return res.status(404).json({ error: 'Reporte no encontrado' });
+            }
+            res.status(200).json({ mensaje: 'Reporte eliminado exitosamente' });
+        });
+    });
+});
+
 // Endpoint para actualizar el perfil del usuario
 app.put('/api/perfil/:idPerfil', upload.single('foto_perfil'), (req, res) => {
     const idPerfil = req.params.idPerfil;

@@ -140,7 +140,8 @@
 
   <!-- Report Section -->
   <section class="report-section">
-    <div class="report-container">
+    <!-- Contenedor para ciudadanos -->
+    <div class="report-container" id="formReporteContainer">
       <h2>Reportar Incidencia</h2>
       <p>Ayúdanos a mantener nuestros parques en óptimas condiciones. Describe el problema a continuación.</p>
 
@@ -164,12 +165,21 @@
       </form>
     </div>
 
-    <!-- Mis Reportes (Oculto si no hay sesión) -->
+    <!-- Mis Reportes (Oculto si no hay sesión, o si es Admin) -->
     <div class="report-container" id="misReportesContainer" style="display: none; margin-top: 2rem;">
       <h2>Mis Reportes</h2>
       <p style="margin-bottom: 1rem;">Aquí puedes ver el estado de las incidencias que has reportado.</p>
       <div id="listaReportes">
         <!-- Los reportes se cargarán aquí -->
+      </div>
+    </div>
+
+    <!-- Gestión de Reportes (Solo para Administradores) -->
+    <div class="report-container" id="gestionReportesContainer" style="display: none; max-width: 800px;">
+      <h2>Gestión de Reportes</h2>
+      <p style="margin-bottom: 1rem;">Administra todas las incidencias reportadas en los parques.</p>
+      <div id="listaTodosReportes">
+        <!-- Todos los reportes se cargarán aquí -->
       </div>
     </div>
   </section>
@@ -270,11 +280,110 @@
       }
     }
 
+    const gestionReportesContainer = document.getElementById("gestionReportesContainer");
+    const listaTodosReportes = document.getElementById("listaTodosReportes");
+    const formReporteContainer = document.getElementById("formReporteContainer");
+
+    // Lógica para Gestión de Reportes (Administrador)
+    async function cargarTodosReportes() {
+      try {
+        const response = await fetch("http://localhost:3000/api/reportes/todos");
+        if (response.ok) {
+          const reportes = await response.json();
+          gestionReportesContainer.style.display = "block";
+          formReporteContainer.style.display = "none"; // Ocultar formulario a admins
+
+          if (reportes.length === 0) {
+            listaTodosReportes.innerHTML = "<p>No hay reportes en el sistema.</p>";
+            return;
+          }
+
+          listaTodosReportes.innerHTML = "";
+          reportes.forEach(rep => {
+            const date = new Date(rep.fecha_creacion).toLocaleDateString('es-ES', {
+              year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            
+            const card = document.createElement('div');
+            card.className = 'report-item';
+            card.innerHTML = `
+              <h4>
+                ${rep.parque_nombre || 'Parque Desconocido'} 
+                <span style="font-size: 0.9rem; font-weight: normal; color: #666;">(por ${rep.usuario_nombre || 'Usuario Desconocido'})</span>
+              </h4>
+              <p style="font-size: 0.85rem; color: #888; margin-bottom: 0.5rem; text-align: left;">
+                <i class="fa-regular fa-calendar"></i> ${date}
+              </p>
+              <p style="text-align: left; margin-bottom: 1rem;">${rep.incidencia}</p>
+              ${rep.foto_evidencia ? `<a href="${rep.foto_evidencia}" target="_blank" style="display: inline-block; margin-bottom: 1rem; font-size: 0.9rem; color: var(--primary-color);">Ver Evidencia <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
+              
+              <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between; border-top: 1px solid #eee; padding-top: 1rem; margin-top: 0.5rem;">
+                <div style="display: flex; gap: 10px; align-items: center; flex: 1;">
+                  <label for="status-${rep.ID_reporte}" style="margin: 0; font-size: 0.9rem;">Estado:</label>
+                  <select id="status-${rep.ID_reporte}" class="form-control" style="padding: 0.4rem; border-radius: 5px; border: 1px solid #ddd; max-width: 150px;">
+                    <option value="Pendiente" ${rep.situacion_del_reporte === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                    <option value="En proceso" ${rep.situacion_del_reporte === 'En proceso' ? 'selected' : ''}>En proceso</option>
+                    <option value="Resuelto" ${rep.situacion_del_reporte === 'Resuelto' ? 'selected' : ''}>Resuelto</option>
+                  </select>
+                  <button class="btn btn-primary" onclick="actualizarEstado(${rep.ID_reporte})" style="padding: 0.4rem 1rem; font-size: 0.9rem;">Actualizar</button>
+                </div>
+                <button class="btn btn-danger" onclick="eliminarReporte(${rep.ID_reporte})" style="padding: 0.4rem 1rem; font-size: 0.9rem; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">Eliminar</button>
+              </div>
+            `;
+            listaTodosReportes.appendChild(card);
+          });
+        }
+      } catch (error) {
+        console.error("Error cargando todos los reportes:", error);
+      }
+    }
+
+    // Funciones globales para botones
+    window.actualizarEstado = async (id) => {
+      const nuevoEstado = document.getElementById(`status-${id}`).value;
+      try {
+        const response = await fetch(`http://localhost:3000/api/reportes/${id}/estado`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ situacion_del_reporte: nuevoEstado })
+        });
+        if (response.ok) {
+          alert('Estado actualizado correctamente.');
+          cargarTodosReportes();
+        } else {
+          alert('Error al actualizar el estado.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    window.eliminarReporte = async (id) => {
+      if (!confirm('¿Estás seguro de que deseas eliminar este reporte? Esta acción no se puede deshacer.')) return;
+      try {
+        const response = await fetch(`http://localhost:3000/api/reportes/${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          alert('Reporte eliminado exitosamente.');
+          cargarTodosReportes();
+        } else {
+          alert('Error al eliminar el reporte.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
     // Verificar sesión al cargar
     const userStr = localStorage.getItem("redverde_user");
     if (userStr) {
       const user = JSON.parse(userStr);
-      cargarMisReportes(user);
+      if (user.rol === 'Admin') {
+        cargarTodosReportes();
+      } else {
+        cargarMisReportes(user);
+      }
     }
 
     formReporte.addEventListener("submit", async (e) => {
